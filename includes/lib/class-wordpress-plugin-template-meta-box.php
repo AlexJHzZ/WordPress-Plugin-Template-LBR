@@ -444,7 +444,8 @@ class WordPress_Plugin_Template_Meta_Box {
     }
     if ($field['inline']){
     } 
-    echo '<div id="remove-'.$field['id'].'" class="lbr-remove-btn-wrap"><button type="button" class="lbr-remove-btn">'.__('Remove','wordpress-plugin-template').'</button></div></div>';
+    echo '<span class="re-control lbr_re_sort_handle ui-sortable-handle"></span>
+    <div id="remove-'.$field['id'].'" class="lbr-remove-btn-wrap"><button type="button" class="lbr-remove-btn">'.__('Remove','wordpress-plugin-template').'</button></div></div>';
     $counter = 'countadd_'.$field['id'];
     $js_code = ob_get_clean ();
     $js_code = str_replace("\n","",$js_code);
