@@ -716,7 +716,7 @@ textarea.lbr-input{
 .lbr-field input[type="week"],
 .select2-container--default .select2-selection--single,
 .lbr-field select,
-.lbr-field textarea,
+.lbr-field textarea.lbr-textarea,
 .lbr-field .wp-color-result {
     background-color: var(--white-color);
     border: 1px solid rgba(var(--font-color-rgb), 0.15) !important;
@@ -795,7 +795,7 @@ textarea.lbr-input{
     margin-right: 20px;
     width: auto;
 }
-.lbr-field textarea {
+.lbr-field textarea.lbr-textarea{
     min-height: 150px !important;
 }
 .lbr-field.lbr-select {
@@ -1706,4 +1706,8 @@ span.re-control:after {
     border-radius: 100%;
     left: 0;
     background-image: url('data:image/svg+xml; utf-8, <svg xmlns="http://www.w3.org/2000/svg" width="22.129" height="21.448" viewBox="0 0 22.129 21.448"><g opacity="0.6"><g transform="translate(5.855 0)"><path d="M0,11.141,6.892,5.57,0,0" transform="translate(11.141 14.555) rotate(90)" fill="%232DB68D"/><path d="M0,0,6.893,5.57,0,11.141" transform="translate(0 6.893) rotate(-90)" fill="%232DB68D"/></g><path d="M22.129,0H0" transform="translate(0 10.531)" fill="none" stroke="%232DB68D" stroke-width="0.25"/></g></svg>');
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    height: 100%;
 }

@@ -2,7 +2,7 @@
 /**
  * Post type declaration file.
  *
- * @package WordPress Plugin Template/Includes
+ * @package Dr Fernandez Core/Includes
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,7 +68,7 @@ class WordPress_Plugin_Template_Post_Type {
 	 * @param string $description Post type description.
 	 * @param array  $options Post type options.
 	 */
-	public function __construct( $parent, $post_type = '', $plural = '', $single = '', $description = '', $options = array() ) {
+	public function __construct( $parent, $post_type = '', $plural = '', $single = '', $description = '', $options = array(), $has_template = false ) {
 
 		if ( ! $post_type || ! $plural || ! $single ) {
 			return;
@@ -89,8 +89,11 @@ class WordPress_Plugin_Template_Post_Type {
 		add_filter( 'post_updated_messages', array( $this, 'updated_messages' ) );
 		add_filter( 'bulk_post_updated_messages', array( $this, 'bulk_updated_messages' ), 10, 2 );
 		
-		/* Filter the single_template with our custom function*/
-		add_filter('single_template', array( $this, 'post_template' ), 11);
+		if($has_template){
+			/* Filter the single_template with our custom function*/
+			add_filter('single_template', array( $this, 'post_template' ), 11);
+			add_filter('template_include', array( $this, 'archive_template' ), 11);
+		}
 	}
 
 	/**
@@ -208,6 +211,26 @@ class WordPress_Plugin_Template_Post_Type {
 	    return $this->parent->dir . '/template/single-'.$this->post_type.'.php';
 	  }
 
+	  return $template;
+	}
+
+
+	/**
+	 * Define template for archive post type
+	 *
+	 * @param  string $template Default Template url.
+	 * @return string           Template url.
+	 */
+	function archive_template( $template ) {
+	  if ( is_post_type_archive($this->post_type) ) {
+	    $theme_files = array('archive-'.$this->post_type.'.php', 'archive-'.$this->post_type.'.php');
+	    $exists_in_theme = locate_template($theme_files, false);
+	    if ( $exists_in_theme != '' ) {
+	      return $exists_in_theme;
+	    } else {
+	      return $this->parent->dir . '/template/archive-'.$this->post_type.'.php';
+	    }
+	  }
 	  return $template;
 	}
 

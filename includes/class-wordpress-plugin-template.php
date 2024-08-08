@@ -371,6 +371,7 @@ class WordPress_Plugin_Template {
 			    'id'             => 'demo_meta_box1',          // meta box id, unique per meta box
 			    'title'          => __('Basic Meta Box fields', 'wordpress-plugin-template'),          // meta box title
 			    'pages'          => array('lbr'),      // post types, accept custom post types as well, default is array('post'); optional
+			    'pageTemplate'   => 'default',
 			    'context'        => 'normal',            // where the meta box appear: normal (default), advanced, side; optional
 			    'priority'       => 'high',            // order of meta box: high (default), low; optional
 			    'fields'         => array(),            // list of meta fields (can be added by field arrays)
@@ -385,9 +386,9 @@ class WordPress_Plugin_Template {
 			//checkbox field
 			$metabox->addCheckbox($prefix.'checkbox_field_id',array('name'=> 'My Checkbox '));
 			//select field
-			$metabox->addSelect($prefix.'select_field_id',array('selectkey1'=>'Select Value1','selectkey2'=>'Select Value2'),array('name'=> 'My select ', 'std'=> array('selectkey2')));
+			$metabox->addSelect($prefix.'select_field_id',array('name'=> 'My select ', 'std'=> array('selectkey2')),array('selectkey1'=>'Select Value1','selectkey2'=>'Select Value2'));
 			//radio field
-			$metabox->addRadio($prefix.'radio_field_id',array('radiokey1'=>'Radio Value1','radiokey2'=>'Radio Value2'),array('name'=> 'My Radio Filed', 'std'=> array('radionkey2')));
+			$metabox->addRadio($prefix.'radio_field_id',array('name'=> 'My Radio Filed', 'std'=> array('radionkey2')),array('radiokey1'=>'Radio Value1','radiokey2'=>'Radio Value2'));
 			//Image field
 			$metabox->addImage($prefix.'image_field_id',array('name'=> 'My Image '));
 			//file upload field
@@ -409,7 +410,7 @@ class WordPress_Plugin_Template {
 			  );
 			  $my_meta2 =  WordPress_Plugin_Template()->register_meta_box($config2);
 			  //add checkboxes list 
-			  $my_meta2->addCheckboxList($prefix.'CheckboxList_field_id',array('checkboxkey1'=>'checkbox Value1','checkboxkey2'=>'checkbox Value2'),array('name'=> 'My checkbox list ', 'std'=> array('checkboxkey2')));
+			  $my_meta2->addCheckboxList($prefix.'CheckboxList_field_id',array('name'=> 'My checkbox list ', 'std'=> array('checkboxkey2')),array('checkboxkey1'=>'checkbox Value1','checkboxkey2'=>'checkbox Value2'));
 			  //date field
 			  $my_meta2->addDate($prefix.'date_field_id',array('name'=> 'My Date '));
 			  //Time field
@@ -419,9 +420,9 @@ class WordPress_Plugin_Template {
 			  //wysiwyg field
 			  $my_meta2->addWysiwyg($prefix.'wysiwyg_field_id',array('name'=> 'My wysiwyg Editor '));
 			  //taxonomy field
-			  $my_meta2->addTaxonomy($prefix.'taxonomy_field_id',array('taxonomy' => 'category'),array('name'=> 'My Taxonomy '));
+			  $my_meta2->addTaxonomy($prefix.'taxonomy_field_id',array('name'=> 'My Taxonomy '),array('taxonomy' => 'category'));
 			  //posts field
-			  $my_meta2->addPosts($prefix.'posts_field_id',array('post_type' => 'post'),array('name'=> 'My Posts '));
+			  $my_meta2->addPosts($prefix.'posts_field_id',array('name'=> 'My Posts '),array('post_type' => 'post'));
 			  //add Code editor field
 			  $my_meta2->addCode($prefix.'code_field_id',array(
 			    'name'   => 'Code editor Field', 
@@ -477,9 +478,9 @@ class WordPress_Plugin_Template {
 			  //checkbox field
 			  $my_meta3->addCheckbox($prefix.'checkbox_field_id',array('name'=> 'My Checkbox '));
 			  //select field
-			  $my_meta3->addSelect($prefix.'select_field_id',array('selectkey1'=>'Select Value1','selectkey2'=>'Select Value2'),array('name'=> 'My select ', 'std'=> array('selectkey2')));
+			  $my_meta3->addSelect($prefix.'select_field_id',array('name'=> 'My select ', 'std'=> array('selectkey2')),array('selectkey1'=>'Select Value1','selectkey2'=>'Select Value2'));
 			  //radio field
-			  $my_meta3->addRadio($prefix.'radio_field_id',array('radiokey1'=>'Radio Value1','radiokey2'=>'Radio Value2'),array('name'=> 'My Radio Filed', 'std'=> array('radionkey2'),'group' => 'end'));
+			  $my_meta3->addRadio($prefix.'radio_field_id',array('name'=> 'My Radio Filed', 'std'=> array('radionkey2'),'group' => 'end'),array('radiokey1'=>'Radio Value1','radiokey2'=>'Radio Value2'));
 			  //Finish Meta Box Declaration 
 			  $my_meta3->Finish();
 

@@ -143,10 +143,10 @@ class WordPress_Plugin_Template_Meta_Box {
     global $typenow;
     if (in_array($typenow,$this->_meta_box['pages']) && $this->is_edit_page()){
       // Enqueue Meta Box Style
-      wp_enqueue_style( $this->parent->_token . '-meta-box', esc_url( $this->parent->assets_url ) . 'css/meta-box.css', array(), $this->parent->_version );
+      //wp_enqueue_style( $this->parent->_token . '-meta-box', esc_url( $this->parent->assets_url ) . 'css/meta-box.css', array(), $this->parent->_version );
       
       // Enqueue Meta Box Scripts
-      wp_enqueue_script( $this->parent->_token . '-meta-box', esc_url( $this->parent->assets_url ) . 'js/meta-box.js', array('jquery'), $this->parent->_version, true);
+      //wp_enqueue_script( $this->parent->_token . '-meta-box', esc_url( $this->parent->assets_url ) . 'js/meta-box.js', array('jquery'), $this->parent->_version, true);
 
       // Make upload feature work event when custom post type doesn't support 'editor'
       if ($this->has_field('image') || $this->has_field('file')){
@@ -174,7 +174,7 @@ class WordPress_Plugin_Template_Meta_Box {
   public function check_field_select() {
     
     // Check if the field is an image or file. If not, return.
-    if ( ! $this->has_field( 'select' ))
+    if ( ! $this->has_field( 'select' ) && ! $this->has_field( 'taxonomy' ))
       return;
       $plugin_path = $this->SelfPath;
       // Enqueu JQuery UI, use proper version.
@@ -235,7 +235,7 @@ class WordPress_Plugin_Template_Meta_Box {
     
     if ( $this->has_field( 'date' ) && $this->is_edit_page() ) {
       // Enqueu JQuery UI, use proper version.
-	  $plugin_path = $this->SelfPath;
+    $plugin_path = $this->SelfPath;
       wp_enqueue_style( 'lbr-jquery-ui-css', $plugin_path .'/js/jquery-ui/jquery-ui.css' );
       wp_enqueue_script( 'jquery-ui');
       wp_enqueue_script( 'jquery-ui-datepicker');
@@ -290,7 +290,9 @@ class WordPress_Plugin_Template_Meta_Box {
    * @access public
    */
   public function add($postType) {
-    if(in_array($postType, $this->_meta_box['pages'])){
+    global $post;
+
+    if(in_array($postType, $this->_meta_box['pages']) && (!isset($this->_meta_box['pageTemplate']) || ($this->_meta_box['pageTemplate'] == get_post_meta($post->ID, '_wp_page_template', true))) ){
       add_meta_box( $this->_meta_box['id'], $this->_meta_box['title'], array( $this, 'show' ),$postType, $this->_meta_box['context'], $this->_meta_box['priority'] );
     }
   }
@@ -350,7 +352,7 @@ class WordPress_Plugin_Template_Meta_Box {
 
       if ($this->inGroup === true){
         if(isset($field['group']) && $field['group'] == 'end'){
-       echo '</div></div></div><div class="lbr-field lbr-submit"><input type="submit" name="" value="'.__('Save changes','wordpress-plugin-template').'" /></div></div>';
+       echo '</div></div></div><div class="lbr-field lbr-submit"><input type="submit" name="" value="'.__('Guardar cambios','wordpress-plugin-template').'" /></div></div>';
           $this->inGroup = false;
         }
       }else{
@@ -385,7 +387,7 @@ class WordPress_Plugin_Template_Meta_Box {
     $c = 0;
     $meta = get_post_meta($post->ID,$field['id'],true);
     
-      if (count($meta) > 0 && is_array($meta) ){
+      if (is_array($meta)  && count($meta) > 0){
          foreach ($meta as $me){
            //for labling toggles 
            $mmm =  isset($me[$field['fields'][0]['id']])? $me[$field['fields'][0]['id']]: "";
@@ -415,12 +417,12 @@ class WordPress_Plugin_Template_Meta_Box {
         if ($field['sortable'])
           echo '<span class="re-control lbr_re_sort_handle"></span>';
 
-        echo '<div class="lbr-remove-btn-wrap"><button class="lbr-remove-btn">'.__('Remove','wordpress-plugin-template').'</button></div></div>';
+        echo '<div id="remove-'.$field['id'].'" class="lbr-remove-btn-wrap"><button class="lbr-remove-btn">'.__('Eliminar','wordpress-plugin-template').'</button></div></div>';
         $c = $c + 1;
         }
       }
 
-    echo '<div id="add-'.$field['id'].'" class="lbr-add-btn-wrap"><button type="button" class="lbr-add-btn lbr-add-glb-tab">'.__('Add','wordpress-plugin-template').'</button></div></div>';
+    echo '<div id="add-'.$field['id'].'" class="lbr-add-btn-wrap"><button type="button" class="lbr-add-btn lbr-add-glb-tab">'.__('Añadir','wordpress-plugin-template').'</button></div></div>';
 
     
     //create all fields once more for js function and catch with object buffer
@@ -445,7 +447,7 @@ class WordPress_Plugin_Template_Meta_Box {
     if ($field['inline']){
     } 
     echo '<span class="re-control lbr_re_sort_handle ui-sortable-handle"></span>
-    <div id="remove-'.$field['id'].'" class="lbr-remove-btn-wrap"><button type="button" class="lbr-remove-btn">'.__('Remove','wordpress-plugin-template').'</button></div></div>';
+    <div id="remove-'.$field['id'].'" class="lbr-remove-btn-wrap"><button type="button" class="lbr-remove-btn">'.__('Eliminar','wordpress-plugin-template').'</button></div></div>';
     $counter = 'countadd_'.$field['id'];
     $js_code = ob_get_clean ();
     $js_code = str_replace("\n","",$js_code);
@@ -458,7 +460,7 @@ class WordPress_Plugin_Template_Meta_Box {
           jQuery("#add-'.$field['id'].'").on(\'click\', function() {
             '.$counter.' = '.$counter.' + 1;
             jQuery(this).before(\''.$js_code.'\');            
-            update_repeater_fields();
+            setTimeout(update_repeater_fields(), 500);
           });
               jQuery(document).on(\'click\', \'#remove-'.$field['id'].'\', function (o) {
                   if (jQuery(this).parent().hasClass("re-control"))
@@ -481,7 +483,7 @@ class WordPress_Plugin_Template_Meta_Box {
    * @access public
    */
   public function show_field_begin( $field, $meta) {
-    echo "<div class='lbr-field lbr-text lbr-floated' ".(($this->inGroup === true)? " valign='top'": "").">";
+    echo "<div class='lbr-field lbr-text lbr-floated' ".(($this->inGroup === true)? "valign='top'": "")." ".(isset($field['cond-field'])?"cond-field='".$field['cond-field']['name']."' cond-field-value='".$field['cond-field']['value']."'":"")." ".(isset($field['cond-field'])?"style='display:none;'":"").">";
     if ( $field['name'] != '' || $field['name'] != FALSE ) {
       echo "<label class='lbr-field-label' for='{$field['id']}'>{$field['name']}</label>";
     }
@@ -744,9 +746,9 @@ class WordPress_Plugin_Template_Meta_Box {
     echo "<input type='hidden' name='{$name}[id]' value='{$value['id']}'/>";
     echo "<input type='hidden' name='{$name}[url]' value='{$value['url']}'/>";
     if ($has_image)
-      echo "<input class='{$multiple} button  simplePanelimageUploadclear' id='{$id}' value='Remove Image' type='button'/>";
+      echo "<input class='{$multiple} button  simplePanelimageUploadclear' id='{$id}' value='Quitar la imagen' type='button'/>";
     else
-      echo "<input class='{$multiple} button simplePanelimageUpload' id='{$id}' value='Upload Image' type='button'/>";
+      echo "<input class='{$multiple} button simplePanelimageUpload' id='{$id}' value='Cargar imagen' type='button'/>";
     echo "</div>";
     $this->show_field_end( $field, $meta );
   }
@@ -849,6 +851,7 @@ class WordPress_Plugin_Template_Meta_Box {
     $this->show_field_begin($field, $meta);
     $options = $field['options'];
     $posts = get_posts($options['args']);
+    $field['multiple'] = isset($field['multiple']) ? $field['multiple'] : false;
     // checkbox_list
     if ('checkbox_list' == $options['type']) {
       foreach ($posts as $p) {
@@ -857,9 +860,9 @@ class WordPress_Plugin_Template_Meta_Box {
     }
     // select
     else {
-      echo "<select ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='lbr-posts-select".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}" . ($field['multiple'] ? "[]' multiple='multiple' style='height:auto'" : "'") . ">";
+      echo "<select ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='lbr-select lbr-posts-select".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}" . ($field['multiple'] ? "[]' multiple='multiple' style='height:auto'" : "'") . ">";
       if (isset($field['emptylabel']))
-        echo '<option value="-1">'.(isset($field['emptylabel'])? $field['emptylabel']: __('Select ...','wordpress-plugin-template')).'</option>';
+        echo '<option value="-1">'.(isset($field['emptylabel'])? $field['emptylabel']: __('Seleccionar ...','wordpress-plugin-template')).'</option>';
       foreach ($posts as $p) {
         echo "<option value='$p->ID'" . selected(in_array($p->ID, $meta), true, false) . ">$p->post_title</option>";
       }
@@ -886,7 +889,7 @@ class WordPress_Plugin_Template_Meta_Box {
     $this->show_field_begin($field, $meta);
     $options = $field['options'];
     $terms = get_terms($options['taxonomy'], $options['args']);
-    
+    $field['multiple'] = isset($field['multiple']) ? $field['multiple'] : false;
     // checkbox_list
     if ('checkbox_list' == $options['type']) {
       foreach ($terms as $term) {
@@ -895,7 +898,7 @@ class WordPress_Plugin_Template_Meta_Box {
     }
     // select
     else {
-      echo "<select ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='lbr-tax-select".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}" . ($field['multiple'] ? "[]' multiple='multiple' style='height:auto'" : "'") . ">";
+      echo "<select ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='lbr-select lbr-tax-select".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}" . ($field['multiple'] ? "[]' multiple='multiple' style='height:auto'" : "'") . ">";
       foreach ($terms as $term) {
         echo "<option value='$term->slug'" . selected(in_array($term->slug, $meta), true, false) . ">$term->name</option>";
       }
@@ -961,6 +964,7 @@ class WordPress_Plugin_Template_Meta_Box {
     if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )                      // Check Autosave
     || ( ! isset( $_POST['post_ID'] ) || $post_id != $_POST['post_ID'] )        // Check Revision
     || ( ! in_array( $post_type, $this->_meta_box['pages'] ) )                  // Check if current post type is supported.
+    || ( isset($this->_meta_box['pageTemplate']) && ($this->_meta_box['pageTemplate'] != get_post_meta($post_id, '_wp_page_template', true)))
     || ( ! check_admin_referer( basename( __FILE__ ), 'lbr_meta_box_nonce') )    // Check nonce - Security
     || ( ! current_user_can( $post_type_object->cap->edit_post, $post_id ) ) )  // Check permission
     {
@@ -1289,7 +1293,7 @@ class WordPress_Plugin_Template_Meta_Box {
    *   @param $repeater bool  is this a field inside a repeatr? true|false(default) 
    */
   public function addNumber($id,$args,$repeater=false){
-    $new_field = array('type' => 'number','id'=> $id,'std' => '0','desc' => '','style' =>'','name' => 'Number Field','step' => '1','min' => '0');
+    $new_field = array('type' => 'number','id'=> $id,'std' => '0','desc' => '','style' =>'','name' => 'Number Field','step' => '1','min' => '0','max' => '1');
     $new_field = array_merge($new_field, $args);
     if(false === $repeater){
       $this->_fields[] = $new_field;
@@ -1406,7 +1410,7 @@ class WordPress_Plugin_Template_Meta_Box {
    *   @return : remember to call: $checkbox_list = get_post_meta(get_the_ID(), 'meta_name', false); 
    *   which means the last param as false to get the values in an array
    */
-  public function addCheckboxList($id,$options,$args,$repeater=false){
+  public function addCheckboxList($id,$args,$options,$repeater=false){
     $new_field = array('type' => 'checkbox_list','id'=> $id,'std' => '','desc' => '','style' =>'','name' => 'Checkbox List Field','options' =>$options,'multiple' => true,);
     $new_field = array_merge($new_field, $args);
     if(false === $repeater){
@@ -1455,7 +1459,7 @@ class WordPress_Plugin_Template_Meta_Box {
    *    'validate_func' => // validate function, string optional
    *  @param $repeater bool  is this a field inside a repeatr? true|false(default) 
    */
-  public function addSelect($id,$options,$args,$repeater=false){
+  public function addSelect($id,$args,$options,$repeater=false){
     $new_field = array('type' => 'select','id'=> $id,'std' => array(),'desc' => '','style' =>'','name' => 'Select Field','multiple' => false,'options' => $options);
     $new_field = array_merge($new_field, $args);
     if(false === $repeater){
@@ -1480,7 +1484,7 @@ class WordPress_Plugin_Template_Meta_Box {
    *    'validate_func' => // validate function, string optional 
    *  @param $repeater bool  is this a field inside a repeatr? true|false(default)
    */
-  public function addRadio($id,$options,$args,$repeater=false){
+  public function addRadio($id,$args,$options,$repeater=false){
     $new_field = array('type' => 'radio','id'=> $id,'std' => array(),'desc' => '','style' =>'','name' => 'Radio Field','options' => $options);
     $new_field = array_merge($new_field, $args);
     if(false === $repeater){
@@ -1646,13 +1650,13 @@ class WordPress_Plugin_Template_Meta_Box {
    *    'validate_func' => // validate function, string optional 
    *  @param $repeater bool  is this a field inside a repeatr? true|false(default)
    */
-  public function addTaxonomy($id,$options,$args,$repeater=false){
+  public function addTaxonomy($id,$args,$options,$repeater=false){
     $temp = array(
       'args' => array('hide_empty' => 0),
-      'tax' => 'category',
+      'taxonomy' => 'category',
       'type' => 'select');
     $options = array_merge($temp,$options);
-    $new_field = array('type' => 'taxonomy','id'=> $id,'desc' => '','name' => 'Taxonomy Field','options'=> $options);
+    $new_field = array('type' => 'taxonomy','id'=> $id,'std' => '','desc' => '','name' => 'Taxonomy Field','options'=> $options);
     $new_field = array_merge($new_field, $args);
     if(false === $repeater){
       $this->_fields[] = $new_field;
@@ -1678,14 +1682,14 @@ class WordPress_Plugin_Template_Meta_Box {
    *    'validate_func' => // validate function, string optional 
    *  @param $repeater bool  is this a field inside a repeatr? true|false(default)
    */
-  public function addPosts($id,$options,$args,$repeater=false){
+  public function addPosts($id,$args,$options,$repeater=false){
     $post_type = isset($options['post_type'])? $options['post_type']: (isset($args['post_type']) ? $args['post_type']: 'post');
     $type = isset($options['type'])? $options['type']: 'select';
     $q = array('posts_per_page' => -1, 'post_type' => $post_type);
     if (isset($options['args']) )
       $q = array_merge($q,(array)$options['args']);
     $options = array('post_type' =>$post_type,'type'=>$type,'args'=>$q);
-    $new_field = array('type' => 'posts','id'=> $id,'desc' => '','name' => 'Posts Field','options'=> $options,'multiple' => false);
+    $new_field = array('type' => 'posts','id'=> $id,'std' => '','desc' => '','name' => 'Posts Field','options'=> $options,'multiple' => false);
     $new_field = array_merge($new_field, $args);
     if(false === $repeater){
       $this->_fields[] = $new_field;
